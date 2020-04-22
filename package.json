@@ -10,20 +10,25 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:sharpie.helloWorld"
+        "onCommand:sharpie.helloWorld",
+        "workspaceContains:**/bundle.json"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "sharpie.helloWorld",
-				"title": "Hello World"
+				"command": "sharpie.loadBundle",
+				"title": "Load Bundle"
 			}
         ],
         "views": {
             "sharpie": [
                 {
-                    "id": "students",
+                    "id": "sharpieOverview",
+                    "name": "Overview"
+                },
+                {
+                    "id": "sharpieStudents",
                     "name": "Students"
                 }
             ]
@@ -39,7 +44,7 @@
         },
         "viewsWelcome": [
             {
-                "view": "students",
+                "view": "sharpieOverview",
                 "contents": "No students to mark.\n[Add Bundle](command:sharpie.loadBundle)"
             }
         ]
