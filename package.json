@@ -19,7 +19,30 @@
 				"command": "sharpie.helloWorld",
 				"title": "Hello World"
 			}
-		]
+        ],
+        "views": {
+            "sharpie": [
+                {
+                    "id": "students",
+                    "name": "Students"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "sharpie",
+                    "title": "Sharpie",
+                    "icon": "resources/logo.svg"
+                }
+            ]
+        },
+        "viewsWelcome": [
+            {
+                "view": "students",
+                "contents": "No students to mark.\n[Add Bundle](command:sharpie.loadBundle)"
+            }
+        ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
