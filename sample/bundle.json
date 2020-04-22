@@ -1,3 +1,38 @@
 {
-    "name": "CSSE2002 A2"
+    "name": "CSSE2002 A2",
+    "rubric": [
+        {
+            "id": "naming",
+            "label": "Naming",
+            "description": "All variables, private methods and classes have meaningful names. No hungarian notation is used.",
+            "marks": 4
+        },
+        {
+            "id": "commenting",
+            "label": "Commenting",
+            "description": "Everything is documented well...",
+            "marks": 6
+        },
+        {
+            "id": "structure",
+            "label": "Structure and Layout",
+            "description": "Code is organised logically and uses whitespace to ease readability.",
+            "marks": 5
+        },
+        {
+            "id": "design",
+            "label": "Code Design",
+            "description": "Well thought out code that is easily followed and is maintainable",
+            "marks": 5
+        },
+        {
+            "id": "oo",
+            "label": "Object-Oriented Practices",
+            "description": "The course content to be applied to solve certain challenges present in the assignment",
+            "marks": 5
+        }
+    ],
+    "layout": {
+        
+    }
 }
