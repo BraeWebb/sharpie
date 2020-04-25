@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getRubric } from './rubric';
+import { getRubric, RubricItem } from './rubric';
 
 
 export type RubricJSON = JSON & {
@@ -9,22 +9,23 @@ export type RubricJSON = JSON & {
     label: string,
     description: string,
     marks: number
-}
+};
 
 export type BundleJSON = JSON & {
     name: string,
     rubric: RubricJSON[]
-}
+};
 
 
-export class BundleOverviewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+export class BundleOverviewProvider implements vscode.TreeDataProvider<RubricItem> {
   constructor(private workspaceRoot: string|undefined) {}
 
-  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+  getTreeItem(element: RubricItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(element?: vscode.TreeItem): Thenable<vscode.TreeItem[]> {
+  getChildren(element?: RubricItem): Thenable<RubricItem[]> {
+      console.log(element);
     if (!this.workspaceRoot) {
       vscode.window.showInformationMessage('No dependency in empty workspace');
       return Promise.resolve([]);
@@ -38,10 +39,14 @@ export class BundleOverviewProvider implements vscode.TreeDataProvider<vscode.Tr
 
     const json: BundleJSON = JSON.parse(fs.readFileSync(bundlePath, 'utf-8'));
 
-    return Promise.resolve(this.getRubric(json));
+    if (element === undefined) {
+        return Promise.resolve(this.getRubric(json));
+    } else {
+        return Promise.resolve(element.children);
+    }
   }
 
-  private getRubric(json: BundleJSON): vscode.TreeItem[] {
+  private getRubric(json: BundleJSON): RubricItem[] {
       return getRubric(json);
   }
 

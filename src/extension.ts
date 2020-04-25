@@ -12,13 +12,13 @@ export function activate(context: vscode.ExtensionContext) {
             canSelectFolders: true,
             canSelectMany: false,
             openLabel: "Load"
-        })
+        });
 	});
 
 	context.subscriptions.push(disposable);
 
     if (!vscode.workspace.rootPath) {
-        return
+        return;
     }
     const bundlePath = path.join(vscode.workspace.rootPath, 'bundle.json');
     const json = JSON.parse(fs.readFileSync(bundlePath, 'utf-8'));
@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     const overviewTree = vscode.window.createTreeView('sharpieOverview', {
         treeDataProvider: new BundleOverviewProvider(vscode.workspace.rootPath)
     });
-    overviewTree.title = "Overview: " + json["name"];
+    overviewTree.title = "Rubric: " + json["name"];
 
 
 }
