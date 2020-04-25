@@ -18,7 +18,11 @@
 			{
 				"command": "sharpie.loadBundle",
 				"title": "Load Bundle"
-			}
+            },
+            {
+                "command": "sharpie.addFeedback",
+                "title": "Add Feedback"
+            }
         ],
         "views": {
             "sharpie": [

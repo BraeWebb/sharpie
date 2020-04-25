@@ -2,19 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { getRubric, RubricItem } from './rubric';
-
-
-export type RubricJSON = JSON & {
-    id: string,
-    label: string,
-    description: string,
-    marks: number
-};
-
-export type BundleJSON = JSON & {
-    name: string,
-    rubric: RubricJSON[]
-};
+import { BundleJSON } from '../../types';
 
 
 export class BundleOverviewProvider implements vscode.TreeDataProvider<RubricItem> {

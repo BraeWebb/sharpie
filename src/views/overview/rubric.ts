@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {BundleJSON, RubricJSON} from './index';
+import {BundleJSON, RubricJSON} from '../../types';
 
 
 export function getRubric(bundle: BundleJSON) {
