@@ -17,18 +17,44 @@
 		"commands": [
 			{
 				"command": "sharpie.loadBundle",
-				"title": "Load Bundle"
+                "title": "Load Bundle",
+                "category": "Sharpie"
             },
             {
                 "command": "sharpie.addFeedback",
-                "title": "Add Feedback"
+                "title": "Add Feedback",
+                "category": "Sharpie"
+            },
+            {
+                "command": "sharpie.openAll",
+                "title": "Open All Submission Files",
+                "category": "Sharpie"
+            },
+            {
+                "command": "sharpie.openMarksheet",
+                "title": "Open Marksheet",
+                "category": "Sharpie"
             }
         ],
+        "menus": {
+            "view/item/context": [
+                {
+                    "when": "view == sharpieStudents && viewItem =~ /student$/i",
+                    "command": "sharpie.openAll",
+                    "group": "navigation"
+                },
+                {
+                    "when": "view == sharpieStudents && viewItem =~ /student$/i",
+                    "command": "sharpie.openMarksheet",
+                    "group": "navigation"
+                }
+            ]
+        },
         "keybindings": [
             {
-              "command": "sharpie.addFeedback",
-              "key": "ctrl+shift+y",
-              "mac": "cmd+shift+y"
+                "command": "sharpie.addFeedback",
+                "key": "ctrl+shift+y",
+                "mac": "cmd+shift+y"
             }
         ],
         "views": {

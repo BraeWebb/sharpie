@@ -6,6 +6,8 @@ import { createStudentView } from './views/students';
 import { BundleJSON } from './types';
 import { addFeedback } from './commands/addFeedback';
 import { loadBundle } from './commands/loadBundle';
+import { openAll } from './commands/openAll';
+import { openMarksheet } from './commands/openMarksheet';
 
 
 function _pathExists(p: string): boolean {
@@ -32,14 +34,16 @@ function loadBundleJSON(): BundleJSON|undefined {
     return bundle;
 }
 
-function registerCommands(bundle: BundleJSON) {
+function registerCommands(context: vscode.ExtensionContext, bundle: BundleJSON) {
     let disposables: vscode.Disposable[] = [];
     disposables.push(vscode.commands.registerCommand('sharpie.addFeedback', addFeedback(bundle)));
+    disposables.push(vscode.commands.registerCommand('sharpie.openAll', openAll(context, bundle)));
+    disposables.push(vscode.commands.registerCommand('sharpie.openMarksheet', openMarksheet(context, bundle)));
 
     return disposables;
 }
 
-function createViews(bundle: BundleJSON) {
+function createViews(context: vscode.ExtensionContext, bundle: BundleJSON) {
     let disposables: vscode.Disposable[] = [];
 
     const overviewTree = vscode.window.createTreeView('sharpieOverview', {
@@ -48,7 +52,7 @@ function createViews(bundle: BundleJSON) {
     overviewTree.title = "Rubric: " + bundle.name;
     disposables.push(overviewTree);
 
-    const studentTree = createStudentView(bundle);
+    const studentTree = createStudentView(bundle, context);
     disposables.push(studentTree);
 
     return disposables;
@@ -56,11 +60,10 @@ function createViews(bundle: BundleJSON) {
 
 function load(context: vscode.ExtensionContext, bundle: BundleJSON) {
     // Create the add feedback command
-    let disposables = registerCommands(bundle);
-    context.subscriptions.concat(disposables);
+    let disposables = registerCommands(context, bundle);
 
     // Create views
-    disposables.concat(createViews(bundle));
+    disposables.concat(createViews(context, bundle));
 
     return disposables;
 }

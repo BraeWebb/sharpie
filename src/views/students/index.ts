@@ -3,12 +3,22 @@ import * as path from 'path';
 import { BundleJSON } from '../../types';
 
 
-export function createStudentView(bundle: BundleJSON) {
+export function createStudentView(bundle: BundleJSON, context: vscode.ExtensionContext) {
     const studentTree = vscode.window.createTreeView('sharpieStudents', {
         canSelectMany: false,
         showCollapseAll: true,
         treeDataProvider: new StudentFileProvider(bundle)
     });
+    
+    let statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    let student = context.workspaceState.get<string>("sharpie.selectedStudent");
+    if (!student) {
+        student = "No Student Selected";
+    }
+    statusBar.text = student;
+    statusBar.command = "sharpie.openMarksheet";
+    statusBar.show();
+
     studentTree.onDidChangeSelection(async e => {
         if (e.selection[0] instanceof StudentFile) {
             if (!e.selection[0].resourceUri) {
@@ -20,14 +30,13 @@ export function createStudentView(bundle: BundleJSON) {
             return;
         }
 
-        const files = await e.selection[0].children();
-        for (let child of files) {
-            if (!child.resourceUri 
-                || child.collapsibleState === vscode.TreeItemCollapsibleState.Collapsed) {
-                continue;
-            }
-            vscode.window.showTextDocument(child.resourceUri, {preview: false});
+        let student = e.selection[0].label;
+        if (!student) {
+            return;
         }
+
+        context.workspaceState.update("sharpie.selectedStudent", student);
+        statusBar.text = student;
     });
 
     return studentTree;
@@ -56,7 +65,7 @@ export class StudentFileProvider implements vscode.TreeDataProvider<AbstractStud
       }
 
       const pattern = new vscode.RelativePattern(root, "s???????/s???????.style");
-      const studentFiles = await vscode.workspace.findFiles(pattern);
+      const studentFiles = await (await vscode.workspace.findFiles(pattern)).sort();
 
       let items = [];
       for (let file of studentFiles) {
@@ -76,6 +85,7 @@ class AbstractStudentItem extends vscode.TreeItem {
 class StudentItem extends AbstractStudentItem {
     constructor(private path: string, private bundle: BundleJSON) {
         super("Loading...", vscode.TreeItemCollapsibleState.Collapsed);
+        this.contextValue = "student";
 
         const regex : RegExp = /\/(s[0-9]*)\/s[0-9]*\.style/;
         const groups = regex.exec(path);
@@ -84,6 +94,15 @@ class StudentItem extends AbstractStudentItem {
         }
 
         this.label = groups[1];
+    }
+
+    // TODO: This is just a POC, when grades start happening update the ticky
+    public get description() {
+        if (path.basename(this.path) < "s4427935.style") {
+            return "✔";
+        } else {
+            return false;
+        }
     }
 
     public async children(): Promise<AbstractStudentItem[]> {
