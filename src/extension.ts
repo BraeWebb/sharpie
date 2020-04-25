@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { BundleOverviewProvider } from './views/overview';
+import { createStudentView } from './views/students';
 import { BundleJSON } from './types';
 import { addFeedback } from './commands/addFeedback';
 import { loadBundle } from './commands/loadBundle';
@@ -40,10 +41,16 @@ function registerCommands(bundle: BundleJSON) {
 
 function createViews(bundle: BundleJSON) {
     let disposables: vscode.Disposable[] = [];
+
     const overviewTree = vscode.window.createTreeView('sharpieOverview', {
         treeDataProvider: new BundleOverviewProvider(bundle)
     });
     overviewTree.title = "Rubric: " + bundle.name;
+    disposables.push(overviewTree);
+
+    const studentTree = createStudentView(bundle);
+    disposables.push(studentTree);
+
     return disposables;
 }
 

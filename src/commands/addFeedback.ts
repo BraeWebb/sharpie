@@ -44,7 +44,6 @@ export function addFeedback(bundle: BundleJSON) {
 
         categoryPicker.onDidChangeSelection(items => {
             const item = items[0];
-            console.log(item);
             categoryPicker.hide();
 
             const issuePicker = vscode.window.createQuickPick();
