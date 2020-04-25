@@ -24,6 +24,13 @@
                 "title": "Add Feedback"
             }
         ],
+        "keybindings": [
+            {
+              "command": "sharpie.addFeedback",
+              "key": "ctrl+shift+y",
+              "mac": "cmd+shift+y"
+            }
+        ],
         "views": {
             "sharpie": [
                 {

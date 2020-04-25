@@ -30,6 +30,11 @@
             "label": "Object-Oriented Practices",
             "description": "The course content to be applied to solve certain challenges present in the assignment",
             "marks": 5
+        },
+        {
+            "id": "general",
+            "label": "General Comments",
+            "description": "General comments on style"
         }
     ],
     "layout": {

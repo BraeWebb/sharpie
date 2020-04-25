@@ -21,7 +21,7 @@ export class RubricItem extends vscode.TreeItem {
   }
 
   get description(): string|boolean {
-    return this.element.marks.toString();
+    return this.element.marks?.toString() || false;
   }
 
   get children(): RubricItem[] {
