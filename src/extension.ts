@@ -1,13 +1,15 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { BundleOverviewProvider } from './views/overview';
+import { createOverviewView } from './views/overview';
+import { StudentState } from './util/student';
 import { createStudentView } from './views/students';
 import { BundleJSON } from './types';
 import { addFeedback } from './commands/addFeedback';
 import { loadBundle } from './commands/loadBundle';
 import { openAll } from './commands/openAll';
 import { openMarksheet } from './commands/openMarksheet';
+import { createStudentStatus } from './statuses/student';
 
 
 function _pathExists(p: string): boolean {
@@ -36,6 +38,7 @@ function loadBundleJSON(): BundleJSON|undefined {
 
 function registerCommands(context: vscode.ExtensionContext, bundle: BundleJSON) {
     let disposables: vscode.Disposable[] = [];
+
     disposables.push(vscode.commands.registerCommand('sharpie.addFeedback', addFeedback(bundle)));
     disposables.push(vscode.commands.registerCommand('sharpie.openAll', openAll(context, bundle)));
     disposables.push(vscode.commands.registerCommand('sharpie.openMarksheet', openMarksheet(context, bundle)));
@@ -46,24 +49,26 @@ function registerCommands(context: vscode.ExtensionContext, bundle: BundleJSON) 
 function createViews(context: vscode.ExtensionContext, bundle: BundleJSON) {
     let disposables: vscode.Disposable[] = [];
 
-    const overviewTree = vscode.window.createTreeView('sharpieOverview', {
-        treeDataProvider: new BundleOverviewProvider(bundle)
-    });
-    overviewTree.title = "Rubric: " + bundle.name;
-    disposables.push(overviewTree);
+    disposables.push(createOverviewView(bundle));
+    disposables.push(createStudentView(bundle));
 
-    const studentTree = createStudentView(bundle, context);
-    disposables.push(studentTree);
+    return disposables;
+}
+
+function createStatuses(context: vscode.ExtensionContext, bundle: BundleJSON) {
+    let disposables: vscode.Disposable[] = [];
+
+    disposables.push(createStudentStatus(context));
 
     return disposables;
 }
 
 function load(context: vscode.ExtensionContext, bundle: BundleJSON) {
-    // Create the add feedback command
-    let disposables = registerCommands(context, bundle);
-
-    // Create views
-    disposables.concat(createViews(context, bundle));
+    let disposables: vscode.Disposable[] = [];
+    
+    disposables.push.apply(disposables, registerCommands(context, bundle));
+    disposables.push.apply(disposables, createViews(context, bundle));
+    disposables.push.apply(disposables, createStatuses(context, bundle));
 
     return disposables;
 }
@@ -83,6 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
     let disposables: vscode.Disposable[] = [];
     let bundle = loadBundleJSON();
     if (bundle) {
+        StudentState.initialise(context, bundle);
         disposables = load(context, bundle);
     }
     

@@ -3,6 +3,16 @@ import { getRubric, RubricItem } from './rubric';
 import { BundleJSON } from '../../types';
 
 
+export function createOverviewView(bundle: BundleJSON) {
+    const overviewTree = vscode.window.createTreeView('sharpieOverview', {
+        treeDataProvider: new BundleOverviewProvider(bundle)
+    });
+    overviewTree.title = "Rubric: " + bundle.name;
+
+    return overviewTree;
+}
+
+
 export class BundleOverviewProvider implements vscode.TreeDataProvider<RubricItem> {
   constructor(private bundle: BundleJSON) {}
 

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { RubricJSON, BundleJSON } from '../types';
+import { StudentState } from '../util/student';
 
 class MarkingCategory implements vscode.QuickPickItem {
 	label: string;
@@ -15,7 +16,7 @@ class DiagnosticMessage implements vscode.QuickPickItem {
     label: string;
 	detail: string;
 	
-	constructor(private diagnostic: vscode.Diagnostic, code?: string) {
+	constructor(public diagnostic: vscode.Diagnostic, code?: string) {
 		this.label = diagnostic.message;
         this.detail = diagnostic.source || "";
         if (code) {
@@ -43,10 +44,10 @@ export function addFeedback(bundle: BundleJSON) {
         categoryPicker.show();
 
         categoryPicker.onDidChangeSelection(items => {
-            const item = items[0];
+            const category = items[0];
             categoryPicker.hide();
 
-            const issuePicker = vscode.window.createQuickPick();
+            const issuePicker = vscode.window.createQuickPick<DiagnosticMessage>();
             let inRangeIssues: DiagnosticMessage[] = [];
             vscode.languages.getDiagnostics(uri).forEach((diagnostic) => {
                 for (let selection of file.selections) {
@@ -77,6 +78,17 @@ export function addFeedback(bundle: BundleJSON) {
                 input.step = 3;
                 input.totalSteps = 3;
                 input.show();
+
+                input.onDidAccept(e => {
+                    StudentState.addFeedback({
+                        path: uri.path,
+                        start: item.diagnostic.range.start,
+                        end: item.diagnostic.range.end,
+                        issue: input.value,
+                        category: category.label
+                    });
+                    input.hide();
+                });
             });
         });
 

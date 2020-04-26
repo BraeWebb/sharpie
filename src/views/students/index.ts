@@ -1,23 +1,15 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { BundleJSON } from '../../types';
+import { StudentState } from '../../util/student';
 
 
-export function createStudentView(bundle: BundleJSON, context: vscode.ExtensionContext) {
+export function createStudentView(bundle: BundleJSON) {
     const studentTree = vscode.window.createTreeView('sharpieStudents', {
         canSelectMany: false,
         showCollapseAll: true,
         treeDataProvider: new StudentFileProvider(bundle)
     });
-    
-    let statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    let student = context.workspaceState.get<string>("sharpie.selectedStudent");
-    if (!student) {
-        student = "No Student Selected";
-    }
-    statusBar.text = student;
-    statusBar.command = "sharpie.openMarksheet";
-    statusBar.show();
 
     studentTree.onDidChangeSelection(async e => {
         if (e.selection[0] instanceof StudentFile) {
@@ -35,8 +27,7 @@ export function createStudentView(bundle: BundleJSON, context: vscode.ExtensionC
             return;
         }
 
-        context.workspaceState.update("sharpie.selectedStudent", student);
-        statusBar.text = student;
+        StudentState.update(student);
     });
 
     return studentTree;
