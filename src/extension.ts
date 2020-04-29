@@ -10,6 +10,7 @@ import { loadBundle } from './commands/loadBundle';
 import { openAll } from './commands/openAll';
 import { openMarksheet } from './commands/openMarksheet';
 import { createStudentStatus } from './statuses/student';
+import { MarkSheetSerializer } from './views/marksheet';
 
 
 function _pathExists(p: string): boolean {
@@ -51,6 +52,8 @@ function createViews(context: vscode.ExtensionContext, bundle: BundleJSON) {
 
     disposables.push(createOverviewView(bundle));
     disposables.push(createStudentView(bundle));
+    
+    vscode.window.registerWebviewPanelSerializer('marksheet', new MarkSheetSerializer());
 
     return disposables;
 }

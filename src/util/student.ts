@@ -31,28 +31,8 @@ export class StudentState {
         return this.context.workspaceState.get("sharpie.selectedStudent");
     }
 
-    private static writeGrades(grades: GradeJSON) {
-        const event = this.cachedEvent;
-        if (!event) {
-            return;
-        }
-
-        const file = path.join(event.file.fsPath, "grades.json");
-        fs.writeFileSync(file, JSON.stringify(grades));
-    }
-
-    private static loadGrades(folder: string): GradeJSON {
-        if (!fs.existsSync(folder)) {
-            const grades = {
-                id: "hi",
-                grades: {},
-                comments: {}
-            };
-            fs.writeFileSync(folder, JSON.stringify(grades));
-            return grades;
-        }
-
-        return JSON.parse(fs.readFileSync(folder, 'utf-8'));
+    static get cache(): StudentUpdateEvent|undefined {
+        return this.cachedEvent;
     }
 
     private static notify(update: StudentUpdateEvent) {
@@ -73,7 +53,7 @@ export class StudentState {
         }
 
         const file = vscode.Uri.file(path.join(root, student));
-        const grades = this.loadGrades(path.join(file.fsPath, "grades.json"));
+        const grades = this.readGrades(path.join(file.fsPath, "grades.json"));
 
         this.context.workspaceState.update("sharpie.selectedStudent", student);
 
@@ -82,6 +62,16 @@ export class StudentState {
             file: file,
             grades: grades
         });
+    }
+  
+    static subscribe(listener: (event: StudentUpdateEvent) => any): string {
+        let id = ID();
+        this.listeners.set(id, listener);
+        return id;
+    }
+
+    static unsubscribe(id: string) {
+        this.listeners.delete(id);
     }
 
     static async addFeedback(comment: Comment) {
@@ -96,18 +86,48 @@ export class StudentState {
         }
         grades.comments[comment.category].push(comment);
 
-        console.log(grades);
         this.writeGrades(grades);
-        this.notify(event);
-    }
-  
-    static subscribe(listener: (event: StudentUpdateEvent) => any): string {
-        let id = ID();
-        this.listeners.set(id, listener);
-        return id;
     }
 
-    static unsubscribe(id: string) {
-        this.listeners.delete(id);
+    static writeGrades(grades: GradeJSON) {
+        const event = this.cachedEvent;
+        if (!event) {
+            return;
+        }
+
+        const file = path.join(event.file.fsPath, "grades.json");
+        fs.writeFileSync(file, JSON.stringify(grades));
+    }
+
+    static readGrades(folder: string): GradeJSON {
+        if (!fs.existsSync(folder)) {
+            const grades = {
+                id: "hi",
+                grades: {},
+                comments: {}
+            };
+            fs.writeFileSync(folder, JSON.stringify(grades));
+            return grades;
+        }
+
+        return JSON.parse(fs.readFileSync(folder, 'utf-8'));
+    }
+
+    static onGradeChange(student: string, listener: (event: StudentUpdateEvent) => any): vscode.Disposable|undefined {
+        if (!workspace.rootPath) {
+            return undefined;
+        }
+
+        const pattern = new vscode.RelativePattern(workspace.rootPath, `${student}/grades.json`);
+        const watcher = workspace.createFileSystemWatcher(pattern);
+        watcher.onDidChange(e => {
+            const update = {
+                id: student,
+                file: e,
+                grades: this.readGrades(e.fsPath)
+            };
+            listener(update);
+        });
+        return watcher;
     }
   }

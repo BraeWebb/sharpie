@@ -6,7 +6,7 @@ class MarkingCategory implements vscode.QuickPickItem {
 	label: string;
 	detail: string;
 	
-	constructor(private category: RubricJSON) {
+	constructor(public category: RubricJSON) {
 		this.label = category.label;
 		this.detail = category.description;
 	}
@@ -33,7 +33,7 @@ export function addFeedback(bundle: BundleJSON) {
             return;
         }
 
-        const categoryPicker = vscode.window.createQuickPick();
+        const categoryPicker = vscode.window.createQuickPick<MarkingCategory>();
         categoryPicker.items = bundle.rubric.map((rubric: RubricJSON) => {
             return new MarkingCategory(rubric);
         });
@@ -53,6 +53,7 @@ export function addFeedback(bundle: BundleJSON) {
                 for (let selection of file.selections) {
                     const intersection = diagnostic.range.intersection(selection);
                     if (intersection !== undefined) {
+                        file.selection = new vscode.Selection(diagnostic.range.start, diagnostic.range.end);
                         const code = file.document.getText(diagnostic.range);
                         inRangeIssues.push(new DiagnosticMessage(diagnostic, code));
                     }
@@ -80,12 +81,13 @@ export function addFeedback(bundle: BundleJSON) {
                 input.show();
 
                 input.onDidAccept(e => {
+                    const path = vscode.workspace.asRelativePath(uri.path);
                     StudentState.addFeedback({
-                        path: uri.path,
+                        path: path,
                         start: item.diagnostic.range.start,
                         end: item.diagnostic.range.end,
                         issue: input.value,
-                        category: category.label
+                        category: category.category.label
                     });
                     input.hide();
                 });

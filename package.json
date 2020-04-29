@@ -10,7 +10,8 @@
 		"Other"
 	],
 	"activationEvents": [
-        "workspaceContains:**/bundle.json"
+        "workspaceContains:**/bundle.json",
+        "onWebviewPanel:marksheet"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -33,7 +34,11 @@
             {
                 "command": "sharpie.openMarksheet",
                 "title": "Open Marksheet",
-                "category": "Sharpie"
+                "category": "Sharpie",
+                "icon": {
+                    "light": "resources/marksheet.png",
+                    "dark": "resources/marksheet.png"
+                }
             }
         ],
         "menus": {
@@ -45,6 +50,12 @@
                 },
                 {
                     "when": "view == sharpieStudents && viewItem =~ /student$/i",
+                    "command": "sharpie.openMarksheet",
+                    "group": "navigation"
+                }
+            ],
+            "editor/title": [
+                {
                     "command": "sharpie.openMarksheet",
                     "group": "navigation"
                 }
